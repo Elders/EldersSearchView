@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">EldersSearchView</string>
+
+    <!-- Speech search dialog -->
+    <string name="speech_search_try_saying_something">Try saying something</string>
+    <!-- Speech search dialog -->
+    <string name="speech_search_try_again">Try again</string>
+    <!-- Speech search dialog -->
+    <string name="speech_search_tap_to_speak">Tap to speak.</string>
+    <!-- Speech search dialog -->
+    <string name="speech_search_didnt_catch_that">Didn\'t catch that. Try speaking again.</string>
+    <!-- Speech search dialog -->
+    <string name="speech_search_not_available">Not available</string>
+</resources>

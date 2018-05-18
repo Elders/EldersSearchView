@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="EldersSearchView">
+        <attr name="hintText" format="string" />
+        <attr name="iconsColor" format="color" />
+        <attr name="suggestionsFileName" format="string" />
+        <attr name="searchViewHeight" format="dimension" />
+        <attr name="iconsWidth" format="dimension" />
+    </declare-styleable>
+
+</resources>

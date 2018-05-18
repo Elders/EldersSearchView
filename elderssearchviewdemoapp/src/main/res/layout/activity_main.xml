@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.eldersoss.elderssearchviewdemoapp.MainActivity">
+
+    <com.eldersoss.elderssearchview.EldersSearchView
+        android:id="@+id/elders_search_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="7dp"
+        android:background="@drawable/elders_search_bar_background"
+        android:elevation="2dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        app:hintText="Search for something"
+        app:iconsColor="@color/colorAccent"
+        app:iconsWidth="60dp"
+        app:searchViewHeight="48dp" />
+
+    <TextView
+        android:id="@+id/text_view_result"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/default_result"
+        android:layout_marginTop="100dp"
+        android:gravity="center" />
+
+</RelativeLayout>
