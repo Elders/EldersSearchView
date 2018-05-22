@@ -82,7 +82,7 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
             Animation.RELATIVE_TO_PARENT, 0f,
             Animation.RELATIVE_TO_PARENT, 0f)
 
-    private var currentSearchWord: String? = null
+    private var currentSearchPhrase: String? = null
 
     private val imm: InputMethodManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
@@ -128,7 +128,7 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
         setupAnimations()
     }
 
-    fun setOnSearchListener(listener: ((word: String) -> Unit)?) {
+    fun setOnSearchListener(listener: ((phrase: String) -> Unit)?) {
         searchListener = listener
     }
 
@@ -136,14 +136,33 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
         backListener = listener
     }
 
-    override fun onTextResult(text: String) {
-        if (text.isNotBlank()) {
+    fun clickBackButton() {
+        backClicked()
+    }
+
+    fun setSearchedPhrase(phrase: String) {
+        val searchPhrase = phrase.trim()
+        imageButtonSearch.visibility = View.GONE
+        imageButtonBack.visibility = View.VISIBLE
+        searchHint.visibility = View.GONE
+        imageButtonSpeech.visibility = View.GONE
+        searchEditText.setText(searchPhrase, TextView.BufferType.EDITABLE)
+        filterButton.visibility = View.VISIBLE
+        currentSearchPhrase = searchPhrase
+    }
+
+    fun searchForPhrase(phrase: String) {
+        if (phrase.isNotBlank()) {
             imageButtonSearch.visibility = View.GONE
             searchHint.visibility = View.GONE
             imageButtonSpeech.visibility = View.GONE
-            searchEditText.setText(text, TextView.BufferType.EDITABLE)
-            searchForText(text)
+            searchEditText.setText(phrase, TextView.BufferType.EDITABLE)
+            searchForText(phrase)
         }
+    }
+
+    override fun onTextResult(text: String) {
+        searchForPhrase(text)
     }
 
     private fun initViewState() {
@@ -317,26 +336,28 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
             showSearchSuggestions()
         })
 
-        imageButtonBack.setOnClickListener({
-            if (suggestionsListView.visibility == View.VISIBLE) {
-                hideSearchSuggestions()
-                if (currentSearchWord == null) {
-                    closeSearching()
-                } else {
+        imageButtonBack.setOnClickListener({ backClicked() })
+    }
 
-                }
-                return@setOnClickListener
-            }
-            val w = backListener?.invoke()
-            if (w == null) {
-                currentSearchWord = null
+    private fun backClicked() {
+        if (suggestionsListView.visibility == View.VISIBLE) {
+            hideSearchSuggestions()
+            if (currentSearchPhrase == null) {
                 closeSearching()
             } else {
-                currentSearchWord = w
-                searchEditText.setText(w, TextView.BufferType.EDITABLE)
-                filterButton.visibility = View.VISIBLE
+
             }
-        })
+            return
+        }
+        val w = backListener?.invoke()
+        if (w == null) {
+            currentSearchPhrase = null
+            closeSearching()
+        } else {
+            currentSearchPhrase = w
+            searchEditText.setText(w, TextView.BufferType.EDITABLE)
+            filterButton.visibility = View.VISIBLE
+        }
     }
 
     private fun startSearching() {
@@ -368,11 +389,11 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
 
     private fun searchForText(text: String) {
         val searchText = text.trim()
-        searchEditText.setText(text, TextView.BufferType.EDITABLE)
+        searchEditText.setText(searchText, TextView.BufferType.EDITABLE)
         filterButton.visibility = View.VISIBLE
-        currentSearchWord = searchText
+        currentSearchPhrase = searchText
         hideSearchSuggestions()
-        searchListener?.invoke(text)
+        searchListener?.invoke(searchText)
         searchSuggestionsAdapter?.addSearch(searchText)
     }
 
@@ -386,17 +407,17 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
 
     private fun hideSearchSuggestions() {
         if (suggestionsListView.visibility == View.VISIBLE) {
-            if (currentSearchWord != null) {
+            if (currentSearchPhrase != null) {
                 filterButton.visibility = View.VISIBLE
 
-                if (currentSearchWord.isNullOrEmpty()) {
+                if (currentSearchPhrase.isNullOrEmpty()) {
                     imageButtonClose.visibility = View.GONE
                     imageButtonSpeech.visibility = View.VISIBLE
                 } else {
                     imageButtonClose.visibility = View.VISIBLE
                     imageButtonSpeech.visibility = View.GONE
                 }
-                searchEditText.setText(currentSearchWord, TextView.BufferType.EDITABLE)
+                searchEditText.setText(currentSearchPhrase, TextView.BufferType.EDITABLE)
             } else {
                 imageButtonBack.visibility = View.GONE
                 filterButton.visibility = View.VISIBLE
