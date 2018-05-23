@@ -3,7 +3,9 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
-    <color name="search_bar_gray">#737173</color>
+    <color name="search_icons_gray">#737173</color>
+    <color name="search_hint_gray">#999999</color>
     <color name="white">#ffffff</color>
+    <color name="background_color">#e7ffe2</color>
     <color name="black">#000000</color>
 </resources>

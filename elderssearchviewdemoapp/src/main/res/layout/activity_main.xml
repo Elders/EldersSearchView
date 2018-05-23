@@ -4,28 +4,31 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background_color"
     tools:context="com.eldersoss.elderssearchviewdemoapp.MainActivity">
-
-    <com.eldersoss.elderssearchview.EldersSearchView
-        android:id="@+id/elders_search_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="7dp"
-        android:background="@drawable/elders_search_bar_background"
-        android:elevation="2dp"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        app:hintText="Search for something"
-        app:iconsColor="@color/colorAccent"
-        app:iconsWidth="60dp"
-        app:searchViewHeight="48dp" />
 
     <TextView
         android:id="@+id/text_view_result"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/default_result"
         android:layout_marginTop="100dp"
-        android:gravity="center" />
+        android:gravity="center"
+        android:text="@string/default_result" />
+
+    <com.eldersoss.elderssearchview.EldersSearchView
+        android:id="@+id/elders_search_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:esvSuggestionsBackground="@drawable/elders_search_bar_background"
+        app:esvBackground="@drawable/elders_search_bar_background"
+        app:esvElevation="2dp"
+        app:esvHintText="Search for something"
+        app:esvHintTextColor="@color/search_hint_gray"
+        app:esvIconsColor="@color/search_icons_gray"
+        app:esvIconsWidth="60dp"
+        app:esvMargin="7dp"
+        app:esvSearchViewHeight="92dp"
+        app:esvSuggestionsFileName="SearchesFileName"
+        app:esvSpeechRecognizerLogo="@drawable/elders_logo"/>
 
 </RelativeLayout>

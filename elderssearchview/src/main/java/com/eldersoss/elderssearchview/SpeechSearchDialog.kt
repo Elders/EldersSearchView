@@ -31,12 +31,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 
 /**
  * Created by IvanVatov on 5/16/2018.
  */
-internal class SpeechSearchDialog(private val activity: Activity, private var listener: SpeechSearchListener?) : RecognitionListener {
+internal class SpeechSearchDialog(private val activity: Activity, private var listener: SpeechSearchListener?, private val logoImageResource: Int) : RecognitionListener {
 
     interface SpeechSearchListener {
         fun onTextResult(text: String)
@@ -49,6 +50,7 @@ internal class SpeechSearchDialog(private val activity: Activity, private var li
     private var bigHeaderText: TextView? = null
     private var smallHeaderText: TextView? = null
     private var tapToSpeechButton: ImageButton? = null
+    private var logoImageView: ImageView? = null
 
 
     init {
@@ -72,6 +74,9 @@ internal class SpeechSearchDialog(private val activity: Activity, private var li
         bigHeaderText = dialog?.findViewById(R.id.big_header_text)
         smallHeaderText = dialog?.findViewById(R.id.small_header_text)
         tapToSpeechButton = dialog?.findViewById(R.id.tap_to_speech_button)
+        logoImageView = dialog?.findViewById(R.id.speech_dialog_logo)
+
+        logoImageView?.setImageResource(logoImageResource)
 
         tapToSpeechButton?.setOnClickListener {
             tapToSpeechButton?.isActivated = true

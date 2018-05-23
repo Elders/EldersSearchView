@@ -2,11 +2,18 @@
 <resources>
 
     <declare-styleable name="EldersSearchView">
-        <attr name="hintText" format="string" />
-        <attr name="iconsColor" format="color" />
-        <attr name="suggestionsFileName" format="string" />
-        <attr name="searchViewHeight" format="dimension" />
-        <attr name="iconsWidth" format="dimension" />
+        <attr name="esvHintText" format="string" />
+        <attr name="esvHintTextColor" format="color" />
+        <attr name="esvIconsColor" format="color" />
+        <attr name="esvSuggestionsFileName" format="string" />
+        <attr name="esvSearchViewHeight" format="dimension" />
+        <attr name="esvIconsWidth" format="dimension" />
+        <attr name="esvElevation" format="dimension" />
+        <attr name="esvMargin" format="dimension" />
+        <attr name="esvBackground" format="reference" />
+        <attr name="esvSuggestionsBackground" format="reference" />
+        <attr name="esvSpeechRecognizerLogo" format="reference" />
+
     </declare-styleable>
 
 </resources>

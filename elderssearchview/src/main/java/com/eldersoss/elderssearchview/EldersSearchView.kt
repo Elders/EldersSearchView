@@ -18,6 +18,7 @@ package com.eldersoss.elderssearchview
 
 import android.app.Activity
 import android.content.Context
+import android.os.Build
 import android.text.Editable
 import android.text.InputType
 import android.text.TextUtils
@@ -29,7 +30,7 @@ import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
 import android.view.animation.Animation
-import android.view.animation.ScaleAnimation
+import android.view.animation.AnimationUtils
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
@@ -47,14 +48,23 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
     private var backListener: (() -> String?)? = null
 
     // Attributes and their default values
-    private var searchHintText: String = ""
-    private var iconsColor = 7565683
-    private var iconsWidth = dpToPixels(48)
-    private var suggestionsFileName = "SuggestionsFile"
-    private var searchBarHeight = dpToPixels(48)
+    private var esvHintText = ""
+    private var esvHintTextColor = -6710887 // Hex #999999
+    private var esvIconsColor = -9211533 // Hex #737173
+    private var esvIconsWidth = dpToPixels(48)
+    private var esvSuggestionsFileName = "SuggestionsFile"
+    private var esvSearchBarHeight = dpToPixels(48)
+    private var esvElevation = dpToPixels(2).toFloat()
+    private var esvMargin = dpToPixels(7)
+    private var esvBackground = R.drawable.elders_search_bar_background
+    private var esvSuggestionsBackground = R.drawable.elders_search_bar_background
+    private var esvSpeechRecognizerLogo = R.drawable.elders_logo
 
 
     private var searchSuggestionsAdapter: SearchSuggestionsAdapter? = null
+
+    private val searchViewLayout = RelativeLayout(context)
+    private val suggestionsViewLayout = RelativeLayout(context)
 
     private val linearLayoutLeft = LinearLayout(context)
     private val imageButtonBack = ImageView(context)
@@ -70,17 +80,8 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
 
     private val suggestionsListView = ListView(context)
 
-    private val hideAnimation = ScaleAnimation(
-            1f, 1f,
-            1f, 0f,
-            Animation.RELATIVE_TO_PARENT, 0f,
-            Animation.RELATIVE_TO_PARENT, 0f)
-
-    private val showAnimation = ScaleAnimation(
-            1f, 1f,
-            0f, 1f,
-            Animation.RELATIVE_TO_PARENT, 0f,
-            Animation.RELATIVE_TO_PARENT, 0f)
+    private val showAnimation = AnimationUtils.loadAnimation(context, R.anim.suggestions_animaiton_show)
+    private val hideAnimation = AnimationUtils.loadAnimation(context, R.anim.suggestions_animaiton_hide)
 
     private var currentSearchPhrase: String? = null
 
@@ -95,30 +96,45 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
         for (i in 0 until customAttributes.indexCount) {
             val a = customAttributes.getIndex(i)
             when (a) {
-                R.styleable.EldersSearchView_hintText -> {
-                    searchHintText = customAttributes.getString(a)
+                R.styleable.EldersSearchView_esvHintText -> {
+                    esvHintText = customAttributes.getString(a)
                 }
-
-                R.styleable.EldersSearchView_iconsColor -> {
-                    iconsColor = customAttributes.getColor(a, iconsColor)
+                R.styleable.EldersSearchView_esvIconsColor -> {
+                    esvIconsColor = customAttributes.getColor(a, esvIconsColor)
                 }
-
-                R.styleable.EldersSearchView_suggestionsFileName -> {
-                    suggestionsFileName = customAttributes.getString(a)
+                R.styleable.EldersSearchView_esvSuggestionsFileName -> {
+                    esvSuggestionsFileName = customAttributes.getString(a)
                 }
-
-                R.styleable.EldersSearchView_searchViewHeight -> {
-                    searchBarHeight = customAttributes.getDimensionPixelSize(a, searchBarHeight)
+                R.styleable.EldersSearchView_esvSearchViewHeight -> {
+                    esvSearchBarHeight = customAttributes.getDimensionPixelSize(a, esvSearchBarHeight)
                 }
-                R.styleable.EldersSearchView_iconsWidth -> {
-                    iconsWidth = customAttributes.getDimensionPixelSize(a, iconsWidth)
+                R.styleable.EldersSearchView_esvIconsWidth -> {
+                    esvIconsWidth = customAttributes.getDimensionPixelSize(a, esvIconsWidth)
+                }
+                R.styleable.EldersSearchView_esvHintTextColor -> {
+                    esvHintTextColor = customAttributes.getColor(a, esvHintTextColor)
+                }
+                R.styleable.EldersSearchView_esvElevation -> {
+                    esvElevation = customAttributes.getDimensionPixelSize(a, esvElevation.toInt()).toFloat()
+                }
+                R.styleable.EldersSearchView_esvBackground -> {
+                    esvBackground = customAttributes.getResourceId(a, esvBackground)
+                }
+                R.styleable.EldersSearchView_esvSuggestionsBackground -> {
+                    esvSuggestionsBackground = customAttributes.getResourceId(a, esvSuggestionsBackground)
+                }
+                R.styleable.EldersSearchView_esvMargin -> {
+                    esvMargin = customAttributes.getDimensionPixelSize(a, esvMargin)
+                }
+                R.styleable.EldersSearchView_esvSpeechRecognizerLogo -> {
+                    esvSpeechRecognizerLogo = customAttributes.getResourceId(a, esvSpeechRecognizerLogo)
                 }
             }
         }
 
         customAttributes.recycle()
 
-        searchSuggestionsAdapter = SearchSuggestionsAdapter((context as Activity), { searchForText(it) }, suggestionsFileName, iconsColor, iconsWidth)
+        searchSuggestionsAdapter = SearchSuggestionsAdapter((context as Activity), { searchForText(it) }, esvSuggestionsFileName, esvIconsColor, esvIconsWidth)
         suggestionsListView.adapter = searchSuggestionsAdapter
 
         applyStyles()
@@ -173,6 +189,28 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
     }
 
     private fun applyStyles() {
+        searchViewLayout.isFocusable = true
+        searchViewLayout.isFocusableInTouchMode = true
+
+        val searchViewLayoutParams = RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+        )
+        searchViewLayoutParams.setMargins(
+                esvMargin,
+                esvMargin,
+                esvMargin,
+                esvMargin
+        )
+
+        searchViewLayout.layoutParams = searchViewLayoutParams
+        searchViewLayout.setBackgroundResource(esvBackground)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            searchViewLayout.elevation = esvElevation
+        }
+
+        this.addView(searchViewLayout)
+
         // Build views tree
         linearLayoutLeft.id = View.generateViewId()
         linearLayoutLeft.addView(imageButtonBack)
@@ -183,17 +221,19 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
         linearLayoutRight.addView(imageButtonSpeech)
         linearLayoutRight.addView(filterButton)
 
-        this.addView(linearLayoutLeft)
+        searchViewLayout.addView(linearLayoutLeft)
 
-        this.addView(searchEditText)
-        this.addView(searchHint)
+        searchViewLayout.addView(searchEditText)
+        searchViewLayout.addView(searchHint)
 
-        this.addView(linearLayoutRight)
-        this.addView(suggestionsListView)
+        searchViewLayout.addView(linearLayoutRight)
+
+        this.addView(suggestionsViewLayout)
+        suggestionsViewLayout.addView(suggestionsListView)
 
         val imageButtonsParams = LinearLayout.LayoutParams(
-                iconsWidth,
-                searchBarHeight
+                esvIconsWidth,
+                esvSearchBarHeight
         )
 
         // style left side
@@ -201,35 +241,34 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
         imageButtonBack.layoutParams = imageButtonsParams
         imageButtonBack.scaleType = ImageView.ScaleType.CENTER
         imageButtonBack.setImageResource(R.drawable.material_icon_arrow_left)
-        imageButtonBack.setColorFilter(iconsColor)
+        imageButtonBack.setColorFilter(esvIconsColor)
 
         imageButtonSearch.layoutParams = imageButtonsParams
         imageButtonSearch.scaleType = ImageView.ScaleType.CENTER
         imageButtonSearch.setImageResource(R.drawable.material_icon_magnify)
-        imageButtonSearch.setColorFilter(iconsColor)
+        imageButtonSearch.setColorFilter(esvIconsColor)
 
         // style input field
-        searchHint.text = searchHintText
+        searchHint.text = esvHintText
         searchHint.textSize = 18F
         searchHint.ellipsize = TextUtils.TruncateAt.END
         searchHint.maxLines = 1
         val searchHintParams = LayoutParams(
                 LayoutParams.WRAP_CONTENT,
-                searchBarHeight
+                esvSearchBarHeight
         )
         searchHintParams.addRule(RelativeLayout.RIGHT_OF, linearLayoutLeft.id)
         searchHint.layoutParams = searchHintParams
         searchHint.gravity = Gravity.CENTER_VERTICAL
-        searchHint.setTextColor(iconsColor)
+        searchHint.setTextColor(esvHintTextColor)
 
 
         val searchEditTextParams = LayoutParams(
                 LayoutParams.WRAP_CONTENT,
-                searchBarHeight
+                esvSearchBarHeight
         )
         searchEditTextParams.addRule(RelativeLayout.RIGHT_OF, linearLayoutLeft.id)
         searchEditTextParams.addRule(RelativeLayout.LEFT_OF, linearLayoutRight.id)
-        searchEditTextParams.addRule(RelativeLayout.ALIGN_PARENT_TOP)
         searchEditText.layoutParams = searchEditTextParams
         searchEditText.imeOptions = EditorInfo.IME_ACTION_SEARCH
         searchEditText.inputType = InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
@@ -238,7 +277,9 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
         searchEditText.setSingleLine(true)
         searchEditText.setTextIsSelectable(false)
         searchEditText.setBackgroundColor(0)
-        searchEditText.gravity = Gravity.CENTER_VERTICAL //TODO: need to be fixed for different resolutions
+        searchEditText.gravity = Gravity.CENTER_VERTICAL
+        val fixPadding = (searchEditText.paddingBottom + searchEditText.paddingTop) / 2
+        searchEditText.setPadding(0, fixPadding, 0, fixPadding)
 
         // style right side
         (linearLayoutRight.layoutParams as LayoutParams).addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
@@ -246,42 +287,58 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
         imageButtonClose.layoutParams = imageButtonsParams
         imageButtonClose.scaleType = ImageView.ScaleType.CENTER
         imageButtonClose.setImageResource(R.drawable.material_icon_close)
-        imageButtonClose.setColorFilter(iconsColor)
+        imageButtonClose.setColorFilter(esvIconsColor)
 
         imageButtonSpeech.layoutParams = imageButtonsParams
         imageButtonSpeech.scaleType = ImageView.ScaleType.CENTER
         imageButtonSpeech.setImageResource(R.drawable.material_icon_microphone)
-        imageButtonSpeech.setColorFilter(iconsColor)
+        imageButtonSpeech.setColorFilter(esvIconsColor)
 
         filterButton.layoutParams = imageButtonsParams
         filterButton.scaleType = ImageView.ScaleType.CENTER
         filterButton.setImageResource(R.drawable.material_icon_filter)
-        filterButton.setColorFilter(iconsColor)
+        filterButton.setColorFilter(esvIconsColor)
 
+        // style suggestions
+        val suggestionsViewLayoutParams = RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+        )
+        suggestionsViewLayoutParams.setMargins(
+                0,
+                esvSearchBarHeight,
+                0,
+                0
+        )
+        suggestionsViewLayout.layoutParams = suggestionsViewLayoutParams
 
         val suggestionsListViewLayoutParams = RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.MATCH_PARENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT
         )
+
         suggestionsListViewLayoutParams.setMargins(
-                0,
-                searchBarHeight,
-                0,
-                0
+                esvMargin,
+                esvMargin,
+                esvMargin,
+                esvMargin
         )
-        suggestionsListView.setBackgroundResource(R.drawable.stroke_at_top)
+        suggestionsListView.setBackgroundResource(esvBackground)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            suggestionsListView.elevation = esvElevation
+            suggestionsListView.z = esvElevation - 1f
+        }
         suggestionsListView.divider = null
         suggestionsListView.layoutParams = suggestionsListViewLayoutParams
         suggestionsListView.visibility = View.GONE
-
     }
 
     private fun initListeners() {
         imageButtonSpeech.setOnClickListener {
             try {
-                SpeechSearchDialog(context as Activity, this)
+                SpeechSearchDialog(context as Activity, this, esvSpeechRecognizerLogo)
             } catch (e: ClassCastException) {
-                Log.e(this.javaClass.name, "")
+                Log.e(this.javaClass.name, e.message)
             }
         }
 
@@ -430,25 +487,27 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
     }
 
     private fun setupAnimations() {
-        hideAnimation.duration = 300
-        hideAnimation.fillAfter = true
-        hideAnimation.setAnimationListener(object : Animation.AnimationListener {
-            override fun onAnimationStart(animation: Animation) {}
+        showAnimation?.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation) {
+                suggestionsListView.visibility = View.VISIBLE
+            }
 
+            override fun onAnimationEnd(animation: Animation) {}
+            override fun onAnimationRepeat(animation: Animation) {}
+        })
+
+        hideAnimation?.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation) {}
             override fun onAnimationEnd(animation: Animation) {
                 suggestionsListView.visibility = View.GONE
             }
 
             override fun onAnimationRepeat(animation: Animation) {}
         })
-
-        showAnimation.duration = 300
-        showAnimation.fillAfter = true
-
     }
 
+
     private fun show(view: View) {
-        view.visibility = View.VISIBLE
         view.startAnimation(showAnimation)
     }
 
