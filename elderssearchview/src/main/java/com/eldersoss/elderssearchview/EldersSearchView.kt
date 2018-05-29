@@ -19,6 +19,8 @@ package com.eldersoss.elderssearchview
 import android.app.Activity
 import android.content.Context
 import android.os.Build
+import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentActivity
 import android.text.Editable
 import android.text.InputType
 import android.text.TextUtils
@@ -30,10 +32,10 @@ import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
 import android.view.animation.Animation
-import android.view.animation.AnimationUtils
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Created by IvanVatov on 5/16/2018.
@@ -56,15 +58,14 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
     private var esvSearchBarHeight = dpToPixels(48)
     private var esvElevation = dpToPixels(2).toFloat()
     private var esvMargin = dpToPixels(7)
-    private var esvBackground = R.drawable.elders_search_bar_background
-    private var esvSuggestionsBackground = R.drawable.elders_search_bar_background
-    private var esvSpeechRecognizerLogo = R.drawable.elders_logo
-
+    private var esvBackground = R.drawable.esv_search_background
+    private var esvSuggestionsBackground = R.drawable.esv_search_background
+    private var esvSpeechRecognizerLogo = R.drawable.esv_elders_logo
 
     private var searchSuggestionsAdapter: SearchSuggestionsAdapter? = null
 
     private val searchViewLayout = RelativeLayout(context)
-    private val suggestionsViewLayout = RelativeLayout(context)
+    private val suggestionsViewLayout = LinearLayout(context)
 
     private val linearLayoutLeft = LinearLayout(context)
     private val imageButtonBack = ImageView(context)
@@ -78,10 +79,11 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
     private val imageButtonSpeech = ImageView(context)
     val filterButton = ImageView(context)
 
-    private val suggestionsListView = ListView(context)
+    private val suggestionsPlaceholder = LinearLayout(context)
+    private var searchSuggestionsFragment: SearchSuggestionsFragment? = null
+    private val dummyFragment = Fragment()
 
-    private val showAnimation = AnimationUtils.loadAnimation(context, R.anim.suggestions_animaiton_show)
-    private val hideAnimation = AnimationUtils.loadAnimation(context, R.anim.suggestions_animaiton_hide)
+    private val isSearchSuggestionsFragmentShown = AtomicBoolean(false)
 
     private var currentSearchPhrase: String? = null
 
@@ -135,13 +137,11 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
         customAttributes.recycle()
 
         searchSuggestionsAdapter = SearchSuggestionsAdapter((context as Activity), { searchForText(it) }, esvSuggestionsFileName, esvIconsColor, esvIconsWidth)
-        suggestionsListView.adapter = searchSuggestionsAdapter
+        searchSuggestionsFragment = SearchSuggestionsFragment.create(searchSuggestionsAdapter!!, esvBackground, esvElevation, esvMargin)
 
         applyStyles()
         initViewState()
         initListeners()
-
-        setupAnimations()
     }
 
     fun setOnSearchListener(listener: ((phrase: String) -> Unit)?) {
@@ -229,7 +229,6 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
         searchViewLayout.addView(linearLayoutRight)
 
         this.addView(suggestionsViewLayout)
-        suggestionsViewLayout.addView(suggestionsListView)
 
         val imageButtonsParams = LinearLayout.LayoutParams(
                 esvIconsWidth,
@@ -240,12 +239,12 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
         linearLayoutLeft.orientation = LinearLayout.HORIZONTAL
         imageButtonBack.layoutParams = imageButtonsParams
         imageButtonBack.scaleType = ImageView.ScaleType.CENTER
-        imageButtonBack.setImageResource(R.drawable.material_icon_arrow_left)
+        imageButtonBack.setImageResource(R.drawable.esv_material_icon_arrow_left)
         imageButtonBack.setColorFilter(esvIconsColor)
 
         imageButtonSearch.layoutParams = imageButtonsParams
         imageButtonSearch.scaleType = ImageView.ScaleType.CENTER
-        imageButtonSearch.setImageResource(R.drawable.material_icon_magnify)
+        imageButtonSearch.setImageResource(R.drawable.esv_material_icon_magnify)
         imageButtonSearch.setColorFilter(esvIconsColor)
 
         // style input field
@@ -286,51 +285,30 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
 
         imageButtonClose.layoutParams = imageButtonsParams
         imageButtonClose.scaleType = ImageView.ScaleType.CENTER
-        imageButtonClose.setImageResource(R.drawable.material_icon_close)
+        imageButtonClose.setImageResource(R.drawable.esv_material_icon_close)
         imageButtonClose.setColorFilter(esvIconsColor)
 
         imageButtonSpeech.layoutParams = imageButtonsParams
         imageButtonSpeech.scaleType = ImageView.ScaleType.CENTER
-        imageButtonSpeech.setImageResource(R.drawable.material_icon_microphone)
+        imageButtonSpeech.setImageResource(R.drawable.esv_material_icon_microphone)
         imageButtonSpeech.setColorFilter(esvIconsColor)
 
         filterButton.layoutParams = imageButtonsParams
         filterButton.scaleType = ImageView.ScaleType.CENTER
-        filterButton.setImageResource(R.drawable.material_icon_filter)
+        filterButton.setImageResource(R.drawable.esv_material_icon_filter)
         filterButton.setColorFilter(esvIconsColor)
 
         // style suggestions
         val suggestionsViewLayoutParams = RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.MATCH_PARENT,
-                RelativeLayout.LayoutParams.WRAP_CONTENT
+                RelativeLayout.LayoutParams.MATCH_PARENT
         )
-        suggestionsViewLayoutParams.setMargins(
-                0,
-                esvSearchBarHeight,
-                0,
-                0
-        )
+
+        suggestionsViewLayoutParams.topMargin = esvSearchBarHeight
+
         suggestionsViewLayout.layoutParams = suggestionsViewLayoutParams
-
-        val suggestionsListViewLayoutParams = RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.MATCH_PARENT,
-                RelativeLayout.LayoutParams.WRAP_CONTENT
-        )
-
-        suggestionsListViewLayoutParams.setMargins(
-                esvMargin,
-                esvMargin,
-                esvMargin,
-                esvMargin
-        )
-        suggestionsListView.setBackgroundResource(esvBackground)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            suggestionsListView.elevation = esvElevation
-            suggestionsListView.z = esvElevation - 1f
-        }
-        suggestionsListView.divider = null
-        suggestionsListView.layoutParams = suggestionsListViewLayoutParams
-        suggestionsListView.visibility = View.GONE
+        suggestionsViewLayout.orientation = LinearLayout.VERTICAL
+        suggestionsViewLayout.id = View.generateViewId()
     }
 
     private fun initListeners() {
@@ -388,22 +366,22 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
         })
 
         imageButtonClose.setOnClickListener({
+            showSearchSuggestions()
             searchEditText.text = null
             searchEditText.requestFocus()
-            showSearchSuggestions()
         })
 
         imageButtonBack.setOnClickListener({ backClicked() })
     }
 
     private fun backClicked() {
-        if (suggestionsListView.visibility == View.VISIBLE) {
-            hideSearchSuggestions()
+        if (isSearchSuggestionsFragmentShown.get()) {
             if (currentSearchPhrase == null) {
                 closeSearching()
             } else {
 
             }
+            hideSearchSuggestions()
             return
         }
         val w = backListener?.invoke()
@@ -446,24 +424,28 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
 
     private fun searchForText(text: String) {
         val searchText = text.trim()
-        searchEditText.setText(searchText, TextView.BufferType.EDITABLE)
-        filterButton.visibility = View.VISIBLE
         currentSearchPhrase = searchText
         hideSearchSuggestions()
+        searchEditText.setText(searchText, TextView.BufferType.EDITABLE)
+        filterButton.visibility = View.VISIBLE
         searchListener?.invoke(searchText)
         searchSuggestionsAdapter?.addSearch(searchText)
     }
 
     private fun showSearchSuggestions() {
-        if (suggestionsListView.visibility != View.VISIBLE) {
+        if (!isSearchSuggestionsFragmentShown.get()) {
+            isSearchSuggestionsFragmentShown.set(true)
+            showHideSuggestions(true)
             searchSuggestionsAdapter?.filterItems(searchEditText.text as CharSequence)
             filterButton.visibility = View.GONE
-            show(suggestionsListView)
+            isSearchSuggestionsFragmentShown.set(true)
         }
     }
 
     private fun hideSearchSuggestions() {
-        if (suggestionsListView.visibility == View.VISIBLE) {
+        if (isSearchSuggestionsFragmentShown.get()) {
+            isSearchSuggestionsFragmentShown.set(false)
+            showHideSuggestions(false)
             if (currentSearchPhrase != null) {
                 filterButton.visibility = View.VISIBLE
 
@@ -477,43 +459,27 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
                 searchEditText.setText(currentSearchPhrase, TextView.BufferType.EDITABLE)
             } else {
                 imageButtonBack.visibility = View.GONE
-                filterButton.visibility = View.VISIBLE
+                filterButton.visibility = View.GONE
             }
-
             imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
             searchEditText.clearFocus()
-            hide(suggestionsListView)
         }
     }
 
-    private fun setupAnimations() {
-        showAnimation?.setAnimationListener(object : Animation.AnimationListener {
-            override fun onAnimationStart(animation: Animation) {
-                suggestionsListView.visibility = View.VISIBLE
+    private fun showHideSuggestions(show: Boolean) {
+        try {
+            val ft = (context as FragmentActivity).supportFragmentManager.beginTransaction()
+            ft?.setCustomAnimations(R.anim.esv_suggestions_animaiton_show,
+                    R.anim.esv_suggestions_animaiton_hide)
+            if (show) {
+                ft?.replace(suggestionsViewLayout.id, searchSuggestionsFragment)
+            } else {
+                ft?.replace(suggestionsViewLayout.id, dummyFragment)
             }
-
-            override fun onAnimationEnd(animation: Animation) {}
-            override fun onAnimationRepeat(animation: Animation) {}
-        })
-
-        hideAnimation?.setAnimationListener(object : Animation.AnimationListener {
-            override fun onAnimationStart(animation: Animation) {}
-            override fun onAnimationEnd(animation: Animation) {
-                suggestionsListView.visibility = View.GONE
-            }
-
-            override fun onAnimationRepeat(animation: Animation) {}
-        })
-    }
-
-
-    private fun show(view: View) {
-        view.startAnimation(showAnimation)
-    }
-
-
-    private fun hide(view: View) {
-        view.startAnimation(hideAnimation)
+            ft?.commit()
+        } catch (e: Exception) {
+            Log.e(this.javaClass.name, e.message)
+        }
     }
 
     private fun dpToPixels(dpValue: Int): Int {

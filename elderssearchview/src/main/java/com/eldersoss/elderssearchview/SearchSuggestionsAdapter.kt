@@ -42,7 +42,7 @@ class SearchSuggestionsAdapter(private val activity: Activity, private val callb
         if (returnView == null) {
             val inflater = activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
-            returnView = inflater.inflate(R.layout.search_suggestions_row, null)
+            returnView = inflater.inflate(R.layout.esv_search_suggestions_row, null)
         }
 
         val historyIcon = returnView?.findViewById<ImageView>(R.id.recent_search_history_icon)

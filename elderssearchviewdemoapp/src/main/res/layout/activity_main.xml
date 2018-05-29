@@ -19,8 +19,8 @@
         android:id="@+id/elders_search_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:esvSuggestionsBackground="@drawable/elders_search_bar_background"
-        app:esvBackground="@drawable/elders_search_bar_background"
+        app:esvSuggestionsBackground="@drawable/esv_search_background"
+        app:esvBackground="@drawable/esv_search_background"
         app:esvElevation="2dp"
         app:esvHintText="Search for something"
         app:esvHintTextColor="@color/search_hint_gray"
@@ -29,6 +29,12 @@
         app:esvMargin="7dp"
         app:esvSearchViewHeight="92dp"
         app:esvSuggestionsFileName="SearchesFileName"
-        app:esvSpeechRecognizerLogo="@drawable/elders_logo"/>
+        app:esvSpeechRecognizerLogo="@drawable/esv_elders_logo">
+        <LinearLayout
+            android:id="@+id/palen_kur"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" />
+    </com.eldersoss.elderssearchview.EldersSearchView>
 
 </RelativeLayout>

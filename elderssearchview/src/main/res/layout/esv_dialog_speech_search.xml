@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/esv_search_background"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/big_header_text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="20dp"
+        android:fontFamily="@font/esv_roboto_regular"
+        android:gravity="center"
+        android:text="@string/speech_search_try_saying_something"
+        android:textSize="20dp" />
+
+    <TextView
+        android:id="@+id/small_header_text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="10dp"
+        android:fontFamily="@font/esv_roboto_regular"
+        android:gravity="center"
+        android:text="@string/speech_search_try_again"
+        android:visibility="invisible" />
+
+    <ImageButton
+        android:id="@+id/tap_to_speech_button"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:background="@drawable/esv_speech_button_shape_selector"
+        android:elevation="4dp"
+        android:src="@drawable/esv_speech_button_icon_selector" />
+
+    <ImageView
+        android:id="@+id/speech_dialog_logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp" />
+
+</LinearLayout>

@@ -68,7 +68,7 @@ internal class SpeechSearchDialog(private val activity: Activity, private var li
     private fun buildDialog() {
         dialog = Dialog(activity)
         dialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog?.setContentView(R.layout.dialog_speech_search)
+        dialog?.setContentView(R.layout.esv_dialog_speech_search)
         dialog?.window?.setLayout((activity.resources.displayMetrics.widthPixels * 0.90).toInt(), ViewGroup.LayoutParams.WRAP_CONTENT)
 
         bigHeaderText = dialog?.findViewById(R.id.big_header_text)
