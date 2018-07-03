@@ -82,7 +82,7 @@ class SearchSuggestionsAdapter(private val activity: Activity, private val callb
     fun filterItems(chars: CharSequence) {
         filterChars = chars
         filteredListItems.clear()
-        filteredListItems.addAll(storage.getSearches().filter { s -> s.contains(chars) })
+        filteredListItems.addAll(storage.getSearches().filter { s -> s.contains(chars, true) })
         notifyDataSetChanged()
     }
 

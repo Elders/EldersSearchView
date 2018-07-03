@@ -14,7 +14,7 @@
         android:fontFamily="@font/esv_roboto_regular"
         android:gravity="center"
         android:text="@string/speech_search_try_saying_something"
-        android:textSize="20dp" />
+        android:textSize="20sp" />
 
     <TextView
         android:id="@+id/small_header_text"
@@ -37,7 +37,8 @@
     <ImageView
         android:id="@+id/speech_dialog_logo"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="24dp"
+        android:scaleType="fitCenter"
         android:layout_margin="20dp" />
 
 </LinearLayout>
