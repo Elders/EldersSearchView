@@ -1,54 +1,42 @@
 package com.eldersoss.elderssearchviewdemoapp
 
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.TextView
-import android.widget.Toast
-import com.eldersoss.elderssearchview.EldersSearchView
-import java.util.*
+import android.view.View
+import android.widget.Button
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
-
-    private class SearchResult(val word: String, val result: String)
-
-    private val searchResultsQueue = ArrayDeque<SearchResult>()
-    private var currentSearchResult: SearchResult? = null
-
-    private var eldersSearchView: EldersSearchView? = null
-
-    private var textViewResult: TextView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        eldersSearchView = findViewById(R.id.elders_search_bar)
-        textViewResult = findViewById(R.id.text_view_result)
+        val buttonFirstDemo = findViewById(R.id.button_first_demo) as? Button
+        buttonFirstDemo?.setOnClickListener(click)
 
-        eldersSearchView?.filterButton?.setOnClickListener {
-            Toast.makeText(this, "Show filter options", Toast.LENGTH_SHORT).show()
-        }
+        val buttonSecondDemo : Button = findViewById(R.id.button_second_demo)
+        buttonSecondDemo.setOnClickListener(click)
 
-        eldersSearchView?.setOnSearchListener {
-            val searchResultFor = "Result for $it"
-            if (currentSearchResult != null) {
-                searchResultsQueue.add(currentSearchResult)
-            }
-            currentSearchResult = SearchResult(it, searchResultFor)
-            Toast.makeText(this, "Search for: $it", Toast.LENGTH_SHORT).show()
-            textViewResult?.text = searchResultFor
-        }
+        findViewById<Button>(R.id.button_third_demo).setOnClickListener(click)
 
-        eldersSearchView?.setOnBackListener {
-            val searchResult = searchResultsQueue.pollLast() // searchResult here can be null
-            currentSearchResult = searchResult
-            if (searchResult != null) {
-                textViewResult?.text = searchResult.result
-            } else {
-                textViewResult?.text = getString(R.string.default_result)
-            }
-            searchResult?.word
-        }
+        button_fourth_demo.setOnClickListener(click)
+        button_fifth_demo.setOnClickListener(click)
+        button_sixth_demo.setOnClickListener(click)
+
     }
 
+    private val click: View.OnClickListener = View.OnClickListener {
+        val cls: Class<*> = when (it.id) {
+            R.id.button_second_demo -> SecondActivity::class.java
+            R.id.button_third_demo -> ThirdActivity::class.java
+            R.id.button_fourth_demo -> FourthActivity::class.java
+            R.id.button_fifth_demo -> FifthActivity::class.java
+            R.id.button_sixth_demo -> SixthActivity::class.java
+            else -> FirstActivity::class.java
+        }
+        val intent = Intent(this, cls)
+        this.startActivity(intent)
+    }
 }

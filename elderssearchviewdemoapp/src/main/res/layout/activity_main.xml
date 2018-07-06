@@ -1,40 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="48dp"
     android:background="@color/background_color"
     tools:context="com.eldersoss.elderssearchviewdemoapp.MainActivity">
 
-    <TextView
-        android:id="@+id/text_view_result"
+    <Button
+        android:id="@+id/button_first_demo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
-        android:gravity="center"
-        android:text="@string/default_result" />
+        android:text="@string/first_demo" />
 
-    <com.eldersoss.elderssearchview.EldersSearchView
-        android:id="@+id/elders_search_bar"
+    <Button
+        android:id="@+id/button_second_demo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:esvSuggestionsBackground="@drawable/esv_search_background"
-        app:esvBackground="@drawable/esv_search_background"
-        app:esvElevation="2dp"
-        app:esvHintText="Search for something"
-        app:esvHintTextColor="@color/search_hint_gray"
-        app:esvIconsColor="@color/search_icons_gray"
-        app:esvIconsWidth="60dp"
-        app:esvMargin="7dp"
-        app:esvSearchViewHeight="92dp"
-        app:esvSuggestionsFileName="SearchesFileName"
-        app:esvSpeechRecognizerLogo="@drawable/esv_elders_logo">
-        <LinearLayout
-            android:id="@+id/palen_kur"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical" />
-    </com.eldersoss.elderssearchview.EldersSearchView>
+        android:text="@string/second_demo" />
 
-</RelativeLayout>
+    <Button
+        android:id="@+id/button_third_demo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/third_demo" />
+
+    <Button
+        android:id="@+id/button_fourth_demo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/fourth_demo" />
+
+    <Button
+        android:id="@+id/button_fifth_demo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/fifth_demo" />
+
+    <Button
+        android:id="@+id/button_sixth_demo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/sixth_demo" />
+
+</LinearLayout>

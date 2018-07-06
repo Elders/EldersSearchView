@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".FourthActivity">
+
+    <com.eldersoss.elderssearchview.EldersSearchView
+        android:id="@+id/elders_search_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:esvBackground="@drawable/esv_search_background"
+        app:esvElevation="2dp"
+        app:esvHintText="Search for something"
+        app:esvHintTextColor="@color/search_hint_gray"
+        app:esvIconsColor="@color/search_icons_gray"
+        app:esvIconsWidth="60dp"
+        app:esvMargin="7dp"
+        app:esvSearchViewHeight="92dp"
+        app:esvSpeechRecognizerLogo="@drawable/esv_elders_logo"
+        app:esvSuggestionsBackground="@drawable/esv_search_background"
+        app:esvSuggestionsFileName="SearchesFileName" />
+
+</android.support.constraint.ConstraintLayout>

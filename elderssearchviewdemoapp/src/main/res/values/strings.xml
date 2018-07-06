@@ -1,4 +1,15 @@
 <resources>
     <string name="app_name">EldersSearchView Demo App</string>
     <string name="default_result">Default result</string>
+    <string name="first_demo">First Demo</string>
+    <string name="second_demo">Second Demo</string>
+    <string name="third_demo">Third Demo</string>
+    <string name="fourth_demo">Fourth Demo</string>
+    <string name="fifth_demo">Fifth Demo</string>
+    <string name="sixth_demo">Sixth Demo</string>
+    <string name="set_text">Set Text</string>
+    <string name="search_for_text">Searched Text</string>
+    <string name="desc_first">All default features enabled, without customization</string>
+    <string name="desc_second">All default features enabled, without customization. It posts requested phrase to another activity.</string>
+    <string name="desc_third">Disabled suggestions, we use it to filer array of strings.</string>
 </resources>
