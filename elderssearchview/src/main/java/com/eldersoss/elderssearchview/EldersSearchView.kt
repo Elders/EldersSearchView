@@ -19,6 +19,7 @@ package com.eldersoss.elderssearchview
 import android.app.Activity
 import android.content.Context
 import android.os.Build
+import android.os.Handler
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 import android.text.Editable
@@ -174,8 +175,8 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
         backListener = listener
     }
 
-    fun clickBackButton() {
-        backClicked()
+    fun clickBackButton(): Boolean {
+        return backClicked()
     }
 
     fun setSearchedPhrase(phrase: String) {
@@ -185,37 +186,24 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
         searchHint.visibility = View.GONE
         imageButtonSpeech.visibility = View.GONE
         searchEditText.setText(searchPhrase, TextView.BufferType.EDITABLE)
+        searchEditText.setSelection(searchEditText.text.length)
         filterButton.visibility = View.VISIBLE
         currentSearchPhrase = searchPhrase
     }
 
+    /**
+     * Public method it invokes search callback listener function
+     */
     fun searchForPhrase(phrase: String) {
         if (phrase.isNotBlank()) {
-            imageButtonSearch.visibility = View.GONE
-            imageButtonBack.visibility = View.VISIBLE
-            searchHint.visibility = View.GONE
-            imageButtonSpeech.visibility = View.GONE
-            searchEditText.setText(phrase, TextView.BufferType.EDITABLE)
             searchForText(phrase)
         }
     }
 
-    fun closeSearching() {
-        searchEditText.clearFocus()
-        searchEditText.text = null
-        if (esvAlwaysBack) {
-            imageButtonBack.visibility = View.VISIBLE
-            imageButtonSearch.visibility = View.GONE
-        } else {
-            imageButtonBack.visibility = View.GONE
-            imageButtonSearch.visibility = View.VISIBLE
-        }
-        searchHint.visibility = View.VISIBLE
-        imageButtonClose.visibility = View.GONE
-        imageButtonSpeech.visibility = View.VISIBLE
-        if (!esvAlwaysFilter && !esvNoFilter) {
-            filterButton.visibility = View.GONE
-        }
+    fun clearSearch() {
+        imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
+        hideSearchSuggestions()
+        closeSearching()
     }
 
     override fun onTextResult(text: String) {
@@ -380,8 +368,6 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
                 val searchText = searchEditText.text.toString()
                 if (searchText.isNotBlank()) {
                     searchForText(searchText)
-                    imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
-                    searchEditText.clearFocus()
                 }
                 return@OnEditorActionListener true
             }
@@ -391,6 +377,8 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
         searchEditText.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 startSearching()
+            } else {
+                hideSearchSuggestions()
             }
         }
 
@@ -421,6 +409,9 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
 
         imageButtonClose.setOnClickListener {
             showSearchSuggestions()
+            if (!esvNoFilter) {
+                filterButton.visibility = View.GONE
+            }
             searchEditText.text = null
             searchEditText.requestFocus()
         }
@@ -428,31 +419,63 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
         imageButtonBack.setOnClickListener { backClicked() }
     }
 
-    private fun backClicked() {
-        if (isSearchSuggestionsFragmentShown.get()) {
+    private fun backClicked(): Boolean {
+        if (hideSearchSuggestions()) {
+            imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
+            searchEditText.clearFocus()
             if (currentSearchPhrase == null) {
                 closeSearching()
             } else {
-
+                searchEditText.setText(currentSearchPhrase, TextView.BufferType.EDITABLE)
             }
-            hideSearchSuggestions()
-            return
+            return true
+        }
+        if (imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)) {
+            closeSearching()
+            return true
         }
         val w = backListener?.invoke()
         if (w == null) {
-            currentSearchPhrase = null
-            closeSearching()
+            if (currentSearchPhrase != null) {
+                currentSearchPhrase = null
+                closeSearching()
+                return true
+            }
+            return false
         } else {
             currentSearchPhrase = w
             searchEditText.setText(w, TextView.BufferType.EDITABLE)
             if (!esvNoFilter) {
                 filterButton.visibility = View.VISIBLE
             }
+            return true
+        }
+    }
+
+    private fun closeSearching() {
+        searchEditText.clearFocus()
+        searchEditText.text = null
+        currentSearchPhrase = null
+        if (esvAlwaysBack) {
+            imageButtonBack.visibility = View.VISIBLE
+            imageButtonSearch.visibility = View.GONE
+        } else {
+            imageButtonBack.visibility = View.GONE
+            imageButtonSearch.visibility = View.VISIBLE
+        }
+        searchHint.visibility = View.VISIBLE
+        imageButtonClose.visibility = View.GONE
+        imageButtonSpeech.visibility = View.VISIBLE
+        if (!esvAlwaysFilter && !esvNoFilter) {
+            filterButton.visibility = View.GONE
         }
     }
 
     private fun startSearching() {
         showSearchSuggestions()
+        if (!esvNoFilter) {
+            filterButton.visibility = View.GONE
+        }
         imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
         if (searchEditText.text.toString().isEmpty()) {
             searchHint.visibility = View.VISIBLE
@@ -470,12 +493,19 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
     private fun searchForText(text: String) {
         val searchText = text.trim()
         currentSearchPhrase = searchText
-        hideSearchSuggestions()
         searchEditText.setText(searchText, TextView.BufferType.EDITABLE)
+        searchEditText.clearFocus()
+        // delay execution to be sure that suggestions has been removed
+        Handler().postDelayed(
+                {
+                    searchListener?.invoke(searchText)
+                }, 300
+        )
+        hideSearchSuggestions()
+        imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
         if (!esvNoFilter) {
             filterButton.visibility = View.VISIBLE
         }
-        searchListener?.invoke(searchText)
         searchSuggestionsAdapter?.addSearch(searchText)
     }
 
@@ -484,41 +514,16 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
             isSearchSuggestionsFragmentShown.set(true)
             showHideSuggestions(true)
             searchSuggestionsAdapter?.filterItems(searchEditText.text as CharSequence)
-            if (!esvNoFilter) {
-                filterButton.visibility = View.GONE
-            }
-            isSearchSuggestionsFragmentShown.set(true)
         }
     }
 
-    private fun hideSearchSuggestions() {
+    private fun hideSearchSuggestions(): Boolean {
         if (isSearchSuggestionsFragmentShown.get() && esvSuggestionsEnabled) {
             isSearchSuggestionsFragmentShown.set(false)
             showHideSuggestions(false)
-            if (currentSearchPhrase != null) {
-                if (!esvNoFilter) {
-                    filterButton.visibility = View.VISIBLE
-                }
-
-                if (currentSearchPhrase.isNullOrEmpty()) {
-                    imageButtonClose.visibility = View.GONE
-                    imageButtonSpeech.visibility = View.VISIBLE
-                } else {
-                    imageButtonClose.visibility = View.VISIBLE
-                    imageButtonSpeech.visibility = View.GONE
-                }
-                searchEditText.setText(currentSearchPhrase, TextView.BufferType.EDITABLE)
-            } else {
-                if (!esvAlwaysBack) {
-                    imageButtonBack.visibility = View.GONE
-                }
-                if (!esvAlwaysFilter && !esvNoFilter) {
-                    filterButton.visibility = View.GONE
-                }
-            }
-            imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
-            searchEditText.clearFocus()
+            return true
         }
+        return false
     }
 
     private fun showHideSuggestions(show: Boolean) {
@@ -531,16 +536,20 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
             } else {
                 ft?.replace(suggestionsViewLayout.id, dummyFragment)
             }
-            ft?.commit()
+            ft?.commitAllowingStateLoss()
         } catch (e: Exception) {
             Log.e(this.javaClass.name, e.message)
         }
     }
 
     private fun dpToPixels(dpValue: Int): Int {
-        return TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP,
-                dpValue.toFloat(),
-                context?.resources?.displayMetrics).toInt()
+        return try {
+            TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP,
+                    dpValue.toFloat(),
+                    context?.resources?.displayMetrics).toInt()
+        } catch (e: Exception) {
+            0
+        }
     }
 }
