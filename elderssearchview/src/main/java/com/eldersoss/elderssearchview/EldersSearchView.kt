@@ -427,6 +427,9 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
                 closeSearching()
             } else {
                 searchEditText.setText(currentSearchPhrase, TextView.BufferType.EDITABLE)
+                if (!esvNoFilter) {
+                    filterButton.visibility = View.VISIBLE
+                }
             }
             return true
         }
