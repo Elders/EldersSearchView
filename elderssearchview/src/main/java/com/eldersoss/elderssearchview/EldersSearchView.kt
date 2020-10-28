@@ -20,8 +20,6 @@ import android.app.Activity
 import android.content.Context
 import android.os.Build
 import android.os.Handler
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentActivity
 import android.text.Editable
 import android.text.InputType
 import android.text.TextUtils
@@ -35,6 +33,8 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -105,13 +105,13 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
             val a = customAttributes.getIndex(i)
             when (a) {
                 R.styleable.EldersSearchView_esvHintText -> {
-                    esvHintText = customAttributes.getString(a)
+                    esvHintText = customAttributes.getString(a) ?: esvHintText
                 }
                 R.styleable.EldersSearchView_esvIconsColor -> {
                     esvIconsColor = customAttributes.getColor(a, esvIconsColor)
                 }
                 R.styleable.EldersSearchView_esvSuggestionsFileName -> {
-                    esvSuggestionsFileName = customAttributes.getString(a)
+                    esvSuggestionsFileName = customAttributes.getString(a) ?: esvSuggestionsFileName
                 }
                 R.styleable.EldersSearchView_esvSearchViewHeight -> {
                     esvSearchBarHeight = customAttributes.getDimensionPixelSize(a, esvSearchBarHeight)
@@ -161,6 +161,17 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
         applyStyles()
         initViewState()
         initListeners()
+    }
+
+    fun setAlwaysBack(value: Boolean) {
+        esvAlwaysBack = value
+        if (value) {
+            imageButtonBack.visibility = View.VISIBLE
+            imageButtonSearch.visibility = View.GONE
+        } else {
+            imageButtonBack.visibility = View.GONE
+            imageButtonSearch.visibility = View.VISIBLE
+        }
     }
 
     fun setOnSearchListener(listener: ((phrase: String) -> Unit)?) {
@@ -532,14 +543,16 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
     private fun showHideSuggestions(show: Boolean) {
         try {
             val ft = (context as FragmentActivity).supportFragmentManager.beginTransaction()
-            ft?.setCustomAnimations(R.anim.esv_suggestions_animaiton_show,
+            ft.setCustomAnimations(R.anim.esv_suggestions_animaiton_show,
                     R.anim.esv_suggestions_animaiton_hide)
             if (show) {
-                ft?.replace(suggestionsViewLayout.id, searchSuggestionsFragment)
+                searchSuggestionsFragment?.let {
+                    ft.replace(suggestionsViewLayout.id, it)
+                }
             } else {
-                ft?.replace(suggestionsViewLayout.id, dummyFragment)
+                ft.replace(suggestionsViewLayout.id, dummyFragment)
             }
-            ft?.commitAllowingStateLoss()
+            ft.commitAllowingStateLoss()
         } catch (e: Exception) {
             Log.e(this.javaClass.name, e.message)
         }

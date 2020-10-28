@@ -1,10 +1,9 @@
 package com.eldersoss.elderssearchviewdemoapp
 
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
+import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -13,18 +12,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val buttonFirstDemo = findViewById(R.id.button_first_demo) as? Button
-        buttonFirstDemo?.setOnClickListener(click)
-
-        val buttonSecondDemo : Button = findViewById(R.id.button_second_demo)
-        buttonSecondDemo.setOnClickListener(click)
-
-        findViewById<Button>(R.id.button_third_demo).setOnClickListener(click)
-
-        button_fourth_demo.setOnClickListener(click)
+        button_first_demo.setOnClickListener(click)
+        button_second_demo.setOnClickListener(click)
+        button_third_demo.setOnClickListener(click)
+        button_fourth_demo?.setOnClickListener(click)
         button_fifth_demo.setOnClickListener(click)
         button_sixth_demo.setOnClickListener(click)
-
     }
 
     private val click: View.OnClickListener = View.OnClickListener {
