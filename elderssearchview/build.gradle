@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'maven-publish'
 
 android {
     compileSdkVersion 31
@@ -34,4 +35,17 @@ dependencies {
 
 tasks.withType(Javadoc) {
     enabled = false
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+                groupId = "com.eldersoss.elderssearchview"
+                artifactId = "EldersSearchView"
+                version = '1.2.0'
+            }
+        }
+    }
 }
