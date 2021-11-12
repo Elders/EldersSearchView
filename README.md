@@ -1,26 +1,28 @@
 # EldersSearchView
 Custom View Search Bar with suggestions
 
-[![screen](https://raw.githubusercontent.com/Elders/EldersSearchView/master/media/esvdemo1.gif)](https://github.com/Elders/EldersSearchView)
-
 Download
 --------
-[ ![Download](https://api.bintray.com/packages/r2d2/EldersSearchView/EldersSearchView/images/download.svg) ](https://bintray.com/r2d2/EldersSearchView/EldersSearchView/_latestVersion)
+[![](https://jitpack.io/v/Elders/EldersSearchView.svg)](https://jitpack.io/#Elders/EldersSearchView)
+
 ```groovy
+repositories {
+    maven { url 'https://jitpack.io' }
+}
+
 dependencies {
-    implementation 'com.eldersoss:elderssearchview:1.0.0'
+    implementation 'com.github.Elders:EldersSearchView:$version'
 }
 ```
-
 Usage
 --------
 Simplest way:
 ```xml
-    <com.eldersoss.elderssearchview.EldersSearchView
-        android:id="@+id/elders_search_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:esvHintText="Search for something" />
+<com.eldersoss.elderssearchview.EldersSearchView
+    android:id="@+id/elders_search_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:esvHintText="Search for something" />
 ```
 Custom attributes
 --------
