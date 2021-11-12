@@ -3,34 +3,25 @@ package com.eldersoss.elderssearchviewdemoapp
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
-import android.widget.Button
+import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
-import com.eldersoss.elderssearchview.EldersSearchView
-import java.util.*
+import com.eldersoss.elderssearchviewdemoapp.databinding.ActivitySecondBinding
 
 class SecondActivity : AppCompatActivity() {
 
-    private class SearchResult(val word: String, val result: String)
-
-    private val searchResultsQueue = ArrayDeque<SearchResult>()
-
-    private var eldersSearchView: EldersSearchView? = null
-
-    private var buttonSearchForText: Button? = null
-    private var buttonSetText: Button? = null
+    var binding: ActivitySecondBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_second)
 
-        eldersSearchView = findViewById(R.id.elders_search_bar)
-        buttonSearchForText = findViewById(R.id.button_search_for_phrase)
-        buttonSetText = findViewById(R.id.button_set_searched_phrase)
+        binding = ActivitySecondBinding.inflate(layoutInflater)
 
-        buttonSetText?.setOnClickListener { eldersSearchView?.setSearchedPhrase(it.tag.toString()) }
-        buttonSearchForText?.setOnClickListener { eldersSearchView?.searchForPhrase(it.tag.toString()) }
+        setContentView(binding?.root)
 
-        eldersSearchView?.setOnSearchListener {
+        binding?.buttonSetSearchedPhrase?.setOnClickListener { binding?.eldersSearchBar?.setSearchedPhrase(it.tag.toString()) }
+        binding?.buttonSearchForPhrase?.setOnClickListener { binding?.eldersSearchBar?.searchForPhrase(it.tag.toString()) }
+
+        binding?.eldersSearchBar?.setOnSearchListener {
 
             val intent = Intent(this, ThirdActivity::class.java)
             val bundle = Bundle()
@@ -38,17 +29,16 @@ class SecondActivity : AppCompatActivity() {
             intent.putExtras(bundle)
             this.startActivity(intent)
 
-
-            Handler().postDelayed(
-                    // clear text from the search bar after some time
-                    { eldersSearchView?.clearSearch() },
-                    1500)
-
+            Handler(Looper.getMainLooper()).postDelayed(
+                // clear text from the search bar after some time
+                { binding?.eldersSearchBar?.clearSearch() },
+                1500
+            )
         }
     }
 
     override fun onBackPressed() {
-        if (eldersSearchView?.clickBackButton() == true) {
+        if (binding?.eldersSearchBar?.clickBackButton() == true) {
             return
         }
         super.onBackPressed()

@@ -2,24 +2,24 @@ package com.eldersoss.elderssearchviewdemoapp
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.eldersoss.elderssearchview.EldersSearchView
+import com.eldersoss.elderssearchviewdemoapp.databinding.ActivityThirdBinding
 
 class ThirdActivity : AppCompatActivity() {
 
-    private var eldersSearchView: EldersSearchView? = null
+    var binding: ActivityThirdBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_third)
 
-        eldersSearchView = findViewById(R.id.elders_search_bar)
+        binding = ActivityThirdBinding.inflate(layoutInflater)
+
+        setContentView(binding?.root)
 
         val phrase: String? = intent.getStringExtra(KEY_SEARCHED_PHRASE)
 
         phrase?.let {
-            eldersSearchView?.setSearchedPhrase(it)
+            binding?.eldersSearchBar?.setSearchedPhrase(it)
         }
-
     }
 
     companion object {

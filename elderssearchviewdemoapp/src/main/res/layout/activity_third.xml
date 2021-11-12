@@ -7,6 +7,13 @@
     android:background="@color/background_color"
     tools:context=".ThirdActivity">
 
+    <com.eldersoss.elderssearchview.EldersSearchView
+        android:id="@+id/elders_search_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:esvHintText="Search for something"
+        app:esvSuggestionsEnabled="false" />
+
     <TextView
         android:id="@+id/text_view_result"
         android:layout_width="match_parent"
@@ -49,12 +56,5 @@
             android:text="@string/search_for_text" />
 
     </LinearLayout>
-
-    <com.eldersoss.elderssearchview.EldersSearchView
-        android:id="@+id/elders_search_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:esvHintText="Search for something"
-        app:esvSuggestionsEnabled="false" />
 
 </RelativeLayout>

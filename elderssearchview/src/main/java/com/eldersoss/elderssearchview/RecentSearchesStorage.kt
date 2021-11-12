@@ -68,12 +68,16 @@ internal class RecentSearchesStorage(private val context: Context, private val l
                 val input = BufferedReader(InputStreamReader(inputStream!!))
                 input.forEachLine { result.add(it) }
             } catch (e: Exception) {
-                Log.e(this.javaClass.name, e.message)
+                e.message?.let {
+                    Log.e(this.javaClass.name, it)
+                }
             } finally {
                 try {
                     inputStream?.close()
                 } catch (e: IOException) {
-                    Log.e(this.javaClass.name, e.message)
+                    e.message?.let {
+                        Log.e(this.javaClass.name, it)
+                    }
                 }
             }
             searches = result
@@ -89,7 +93,9 @@ internal class RecentSearchesStorage(private val context: Context, private val l
                 outputStreamWriter.write(data)
                 outputStreamWriter.close()
             } catch (e: IOException) {
-                Log.e(this.javaClass.name, e.message)
+                e.message?.let {
+                    Log.e(this.javaClass.name, it)
+                }
             }
         }
     }

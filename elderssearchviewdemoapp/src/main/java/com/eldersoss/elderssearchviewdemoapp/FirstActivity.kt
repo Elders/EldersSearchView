@@ -1,11 +1,9 @@
 package com.eldersoss.elderssearchviewdemoapp
 
 import android.os.Bundle
-import android.widget.Button
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.eldersoss.elderssearchview.EldersSearchView
+import com.eldersoss.elderssearchviewdemoapp.databinding.ActivityFirstBinding
 import java.util.*
 
 class FirstActivity : AppCompatActivity() {
@@ -15,29 +13,23 @@ class FirstActivity : AppCompatActivity() {
     private val searchResultsQueue = ArrayDeque<SearchResult>()
     private var currentSearchResult: SearchResult? = null
 
-    private var eldersSearchView: EldersSearchView? = null
-
-    private var textViewResult: TextView? = null
-    private var buttonSearchForText: Button? = null
-    private var buttonSetText: Button? = null
+    var binding: ActivityFirstBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_first)
 
-        eldersSearchView = findViewById(R.id.elders_search_bar)
-        textViewResult = findViewById(R.id.text_view_result)
-        buttonSearchForText = findViewById(R.id.button_search_for_phrase)
-        buttonSetText = findViewById(R.id.button_set_searched_phrase)
+        binding = ActivityFirstBinding.inflate(layoutInflater)
 
-        buttonSetText?.setOnClickListener { eldersSearchView?.setSearchedPhrase(it.tag.toString()) }
-        buttonSearchForText?.setOnClickListener { eldersSearchView?.searchForPhrase(it.tag.toString()) }
+        setContentView(binding?.root)
 
-        eldersSearchView?.filterButton?.setOnClickListener {
+        binding?.buttonSetSearchedPhrase?.setOnClickListener { binding?.eldersSearchBar?.setSearchedPhrase(it.tag.toString()) }
+        binding?.buttonSearchForPhrase?.setOnClickListener { binding?.eldersSearchBar?.searchForPhrase(it.tag.toString()) }
+
+        binding?.eldersSearchBar?.filterButton?.setOnClickListener {
             Toast.makeText(this, "Show filter options", Toast.LENGTH_SHORT).show()
         }
 
-        eldersSearchView?.setOnSearchListener {
+        binding?.eldersSearchBar?.setOnSearchListener {
             //            val intent = Intent(this, SecondActivity::class.java)
 //            this.startActivity(intent)
 //            Handler().postDelayed(
@@ -50,23 +42,23 @@ class FirstActivity : AppCompatActivity() {
             }
             currentSearchResult = SearchResult(it, searchResultFor)
             Toast.makeText(this, "Search for: $it", Toast.LENGTH_SHORT).show()
-            textViewResult?.text = searchResultFor
+            binding?.textViewResult?.text = searchResultFor
         }
 
-        eldersSearchView?.setOnBackListener {
+        binding?.eldersSearchBar?.setOnBackListener {
             val searchResult = searchResultsQueue.pollLast() // searchResult here can be null
             currentSearchResult = searchResult
             if (searchResult != null) {
-                textViewResult?.text = searchResult.result
+                binding?.textViewResult?.text = searchResult.result
             } else {
-                textViewResult?.text = getString(R.string.default_result)
+                binding?.textViewResult?.text = getString(R.string.default_result)
             }
             searchResult?.word
         }
     }
 
     override fun onBackPressed() {
-        if (eldersSearchView?.clickBackButton() == true) {
+        if (binding?.eldersSearchBar?.clickBackButton() == true) {
             return
         }
         super.onBackPressed()

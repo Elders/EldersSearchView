@@ -20,6 +20,9 @@
         app:esvSearchViewHeight="92dp"
         app:esvSpeechRecognizerLogo="@drawable/esv_elders_logo"
         app:esvSuggestionsBackground="@drawable/esv_search_background"
-        app:esvSuggestionsFileName="SearchesFileName" />
+        app:esvSuggestionsFileName="SearchesFileName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

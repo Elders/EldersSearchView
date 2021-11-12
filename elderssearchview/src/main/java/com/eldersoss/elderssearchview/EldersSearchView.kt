@@ -24,9 +24,7 @@ import android.text.Editable
 import android.text.InputType
 import android.text.TextUtils
 import android.text.TextWatcher
-
 import android.util.AttributeSet
-import android.util.Log
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
@@ -83,6 +81,7 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
     private val linearLayoutRight = LinearLayout(context)
     private val imageButtonClose = ImageView(context)
     private val imageButtonSpeech = ImageView(context)
+
     // the filter button is public
     val filterButton = ImageView(context)
 
@@ -96,10 +95,14 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
     private val imm: InputMethodManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
+
+        z = 250F
+
         val customAttributes = context.theme.obtainStyledAttributes(
-                attrs,
-                R.styleable.EldersSearchView,
-                0, 0)
+            attrs,
+            R.styleable.EldersSearchView,
+            0, 0
+        )
 
         for (i in 0 until customAttributes.indexCount) {
             val a = customAttributes.getIndex(i)
@@ -154,8 +157,8 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
 
         customAttributes.recycle()
         if (esvSuggestionsEnabled) {
-
-            searchSuggestionsAdapter = SearchSuggestionsAdapter((context as Activity), { searchForText(it) }, esvSuggestionsFileName, esvIconsColor, esvIconsWidth)
+            val activity = (context as? Activity) ?: return
+            searchSuggestionsAdapter = SearchSuggestionsAdapter(activity, { searchForText(it) }, esvSuggestionsFileName, esvIconsColor, esvIconsWidth)
             searchSuggestionsFragment = SearchSuggestionsFragment.create(searchSuggestionsAdapter!!, esvBackground, esvElevation, esvMargin)
         }
         applyStyles()
@@ -238,15 +241,15 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
         searchViewLayout.isFocusable = true
         searchViewLayout.isFocusableInTouchMode = true
 
-        val searchViewLayoutParams = RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.MATCH_PARENT,
-                RelativeLayout.LayoutParams.WRAP_CONTENT
+        val searchViewLayoutParams = LayoutParams(
+            LayoutParams.MATCH_PARENT,
+            LayoutParams.WRAP_CONTENT
         )
         searchViewLayoutParams.setMargins(
-                esvMargin,
-                esvMargin,
-                esvMargin,
-                esvMargin
+            esvMargin,
+            esvMargin,
+            esvMargin,
+            esvMargin
         )
 
         searchViewLayout.layoutParams = searchViewLayoutParams
@@ -278,8 +281,8 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
         searchViewLayout.addView(linearLayoutRight)
 
         val imageButtonsParams = LinearLayout.LayoutParams(
-                esvIconsWidth,
-                esvSearchBarHeight
+            esvIconsWidth,
+            esvSearchBarHeight
         )
 
         // style left side
@@ -300,27 +303,27 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
         searchHint.ellipsize = TextUtils.TruncateAt.END
         searchHint.maxLines = 1
         val searchHintParams = LayoutParams(
-                LayoutParams.WRAP_CONTENT,
-                esvSearchBarHeight
+            LayoutParams.WRAP_CONTENT,
+            esvSearchBarHeight
         )
-        searchHintParams.addRule(RelativeLayout.RIGHT_OF, linearLayoutLeft.id)
+        searchHintParams.addRule(RIGHT_OF, linearLayoutLeft.id)
         searchHint.layoutParams = searchHintParams
         searchHint.gravity = Gravity.CENTER_VERTICAL
         searchHint.setTextColor(esvHintTextColor)
 
 
         val searchEditTextParams = LayoutParams(
-                LayoutParams.WRAP_CONTENT,
-                esvSearchBarHeight
+            LayoutParams.WRAP_CONTENT,
+            esvSearchBarHeight
         )
-        searchEditTextParams.addRule(RelativeLayout.RIGHT_OF, linearLayoutLeft.id)
-        searchEditTextParams.addRule(RelativeLayout.LEFT_OF, linearLayoutRight.id)
+        searchEditTextParams.addRule(RIGHT_OF, linearLayoutLeft.id)
+        searchEditTextParams.addRule(LEFT_OF, linearLayoutRight.id)
         searchEditText.layoutParams = searchEditTextParams
         searchEditText.imeOptions = EditorInfo.IME_ACTION_SEARCH
         searchEditText.inputType = InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
         searchEditText.isLongClickable = false
         searchEditText.maxLines = 1
-        searchEditText.setSingleLine(true)
+        searchEditText.isSingleLine = true
         searchEditText.setTextIsSelectable(false)
         searchEditText.setBackgroundColor(0)
         searchEditText.gravity = Gravity.CENTER_VERTICAL
@@ -328,7 +331,7 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
         searchEditText.setPadding(0, fixPadding, 0, fixPadding)
 
         // style right side
-        (linearLayoutRight.layoutParams as LayoutParams).addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
+        (linearLayoutRight.layoutParams as LayoutParams).addRule(ALIGN_PARENT_RIGHT)
 
         imageButtonClose.layoutParams = imageButtonsParams
         imageButtonClose.scaleType = ImageView.ScaleType.CENTER
@@ -350,9 +353,9 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
         if (esvSuggestionsEnabled) {
             this.addView(suggestionsViewLayout)
             // style suggestions
-            val suggestionsViewLayoutParams = RelativeLayout.LayoutParams(
-                    RelativeLayout.LayoutParams.MATCH_PARENT,
-                    RelativeLayout.LayoutParams.MATCH_PARENT
+            val suggestionsViewLayoutParams = LayoutParams(
+                LayoutParams.MATCH_PARENT,
+                LayoutParams.MATCH_PARENT
             )
 
             suggestionsViewLayoutParams.topMargin = esvSearchBarHeight
@@ -365,10 +368,8 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
 
     private fun initListeners() {
         imageButtonSpeech.setOnClickListener {
-            try {
-                SpeechSearchDialog(context as Activity, this, esvSpeechRecognizerLogo)
-            } catch (e: ClassCastException) {
-                Log.e(this.javaClass.name, e.message)
+            (context as? Activity)?.let {
+                SpeechSearchDialog(it, this, esvSpeechRecognizerLogo)
             }
         }
 
@@ -385,7 +386,7 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
             false
         })
 
-        searchEditText.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+        searchEditText.onFocusChangeListener = OnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 startSearching()
             } else {
@@ -511,9 +512,9 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
         searchEditText.clearFocus()
         // delay execution to be sure that suggestions has been removed
         Handler().postDelayed(
-                {
-                    searchListener?.invoke(searchText)
-                }, 300
+            {
+                searchListener?.invoke(searchText)
+            }, 300
         )
         hideSearchSuggestions()
         imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
@@ -541,29 +542,31 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
     }
 
     private fun showHideSuggestions(show: Boolean) {
-        try {
-            val ft = (context as FragmentActivity).supportFragmentManager.beginTransaction()
-            ft.setCustomAnimations(R.anim.esv_suggestions_animaiton_show,
-                    R.anim.esv_suggestions_animaiton_hide)
-            if (show) {
-                searchSuggestionsFragment?.let {
-                    ft.replace(suggestionsViewLayout.id, it)
-                }
-            } else {
-                ft.replace(suggestionsViewLayout.id, dummyFragment)
+
+        val activity: FragmentActivity = context as? FragmentActivity ?: return
+
+        val ft = activity.supportFragmentManager.beginTransaction()
+        ft.setCustomAnimations(
+            R.anim.esv_suggestions_animaiton_show,
+            R.anim.esv_suggestions_animaiton_hide
+        )
+        if (show) {
+            searchSuggestionsFragment?.let {
+                ft.replace(suggestionsViewLayout.id, it)
             }
-            ft.commitAllowingStateLoss()
-        } catch (e: Exception) {
-            Log.e(this.javaClass.name, e.message)
+        } else {
+            ft.replace(suggestionsViewLayout.id, dummyFragment)
         }
+        ft.commitAllowingStateLoss()
     }
 
     private fun dpToPixels(dpValue: Int): Int {
         return try {
             TypedValue.applyDimension(
-                    TypedValue.COMPLEX_UNIT_DIP,
-                    dpValue.toFloat(),
-                    context?.resources?.displayMetrics).toInt()
+                TypedValue.COMPLEX_UNIT_DIP,
+                dpValue.toFloat(),
+                context?.resources?.displayMetrics
+            ).toInt()
         } catch (e: Exception) {
             0
         }

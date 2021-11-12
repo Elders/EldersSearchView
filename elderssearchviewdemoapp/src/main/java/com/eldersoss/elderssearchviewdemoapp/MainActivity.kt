@@ -4,20 +4,25 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_main.*
+import com.eldersoss.elderssearchviewdemoapp.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
+    var binding: ActivityMainBinding? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
 
-        button_first_demo.setOnClickListener(click)
-        button_second_demo.setOnClickListener(click)
-        button_third_demo.setOnClickListener(click)
-        button_fourth_demo?.setOnClickListener(click)
-        button_fifth_demo.setOnClickListener(click)
-        button_sixth_demo.setOnClickListener(click)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+
+        setContentView(binding?.root)
+
+        binding?.buttonFirstDemo?.setOnClickListener(click)
+        binding?.buttonSecondDemo?.setOnClickListener(click)
+        binding?.buttonThirdDemo?.setOnClickListener(click)
+        binding?.buttonFourthDemo?.setOnClickListener(click)
+        binding?.buttonFifthDemo?.setOnClickListener(click)
+        binding?.buttonSixthDemo?.setOnClickListener(click)
     }
 
     private val click: View.OnClickListener = View.OnClickListener {
