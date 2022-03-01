@@ -10,6 +10,7 @@
         android:id="@+id/elders_search_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:esvAlwaysFilter="true"
         app:esvBackground="@drawable/esv_search_background"
         app:esvElevation="2dp"
         app:esvHintText="Search for something"

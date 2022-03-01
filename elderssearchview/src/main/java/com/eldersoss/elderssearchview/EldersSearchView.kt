@@ -483,6 +483,8 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
         imageButtonSpeech.visibility = View.VISIBLE
         if (!esvAlwaysFilter && !esvNoFilter) {
             filterButton.visibility = View.GONE
+        } else {
+            filterButton.visibility = View.VISIBLE
         }
     }
 
