@@ -28,6 +28,7 @@ import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
+import android.view.View.OnFocusChangeListener
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
@@ -218,6 +219,11 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
         imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
         hideSearchSuggestions()
         closeSearching()
+    }
+
+    fun setEsvNoFilter(value: Boolean) {
+        esvNoFilter = value
+        filterButton.visibility = if (value) View.GONE else View.VISIBLE
     }
 
     override fun onTextResult(text: String) {
