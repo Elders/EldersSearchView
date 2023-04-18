@@ -18,6 +18,7 @@ package com.eldersoss.elderssearchview
 
 import android.app.Activity
 import android.content.Context
+import android.content.ContextWrapper
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
@@ -159,7 +160,8 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
 
         customAttributes.recycle()
         if (esvSuggestionsEnabled) {
-            searchSuggestionsAdapter = SearchSuggestionsAdapter(context, { searchForText(it) }, esvSuggestionsFileName, esvIconsColor, esvIconsWidth)
+            val activity = context.resolveActivity()
+            searchSuggestionsAdapter = SearchSuggestionsAdapter(activity, { searchForText(it) }, esvSuggestionsFileName, esvIconsColor, esvIconsWidth)
             searchSuggestionsFragment = SearchSuggestionsFragment.create(searchSuggestionsAdapter!!, esvBackground, esvElevation, esvMargin)
         }
         applyStyles()
