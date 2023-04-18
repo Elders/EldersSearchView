@@ -20,6 +20,7 @@ import android.app.Activity
 import android.content.Context
 import android.os.Build
 import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.InputType
 import android.text.TextUtils
@@ -49,6 +50,8 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
     private var searchTextChangeListener: ((chars: CharSequence?) -> Unit)? = null
 
     private var backListener: (() -> String?)? = null
+
+    private val activity: Activity
 
     // Attributes and their default values
     private var esvHintText = ""
@@ -98,6 +101,7 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
 
         z = 250F
+        activity = context.resolveActivity()
 
         val customAttributes = context.theme.obtainStyledAttributes(
             attrs,
@@ -158,7 +162,6 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
 
         customAttributes.recycle()
         if (esvSuggestionsEnabled) {
-            val activity = (context as? Activity) ?: return
             searchSuggestionsAdapter = SearchSuggestionsAdapter(activity, { searchForText(it) }, esvSuggestionsFileName, esvIconsColor, esvIconsWidth)
             searchSuggestionsFragment = SearchSuggestionsFragment.create(searchSuggestionsAdapter!!, esvBackground, esvElevation, esvMargin)
         }
@@ -374,9 +377,7 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
 
     private fun initListeners() {
         imageButtonSpeech.setOnClickListener {
-            (context as? Activity)?.let {
-                SpeechSearchDialog(it, this, esvSpeechRecognizerLogo)
-            }
+            SpeechSearchDialog(activity, this, esvSpeechRecognizerLogo)
         }
 
         imageButtonSearch.setOnClickListener { searchEditText.requestFocus() }
@@ -499,7 +500,7 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
         if (!esvNoFilter) {
             filterButton.visibility = View.GONE
         }
-        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
+        imm.showSoftInput(searchEditText, InputMethodManager.HIDE_IMPLICIT_ONLY)
         if (searchEditText.text.toString().isEmpty()) {
             searchHint.visibility = View.VISIBLE
             imageButtonSpeech.visibility = View.VISIBLE
@@ -519,7 +520,7 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
         searchEditText.setText(searchText, TextView.BufferType.EDITABLE)
         searchEditText.clearFocus()
         // delay execution to be sure that suggestions has been removed
-        Handler().postDelayed(
+        Handler(Looper.getMainLooper()).postDelayed(
             {
                 searchListener?.invoke(searchText)
             }, 300
@@ -551,7 +552,7 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
 
     private fun showHideSuggestions(show: Boolean) {
 
-        val activity: FragmentActivity = context as? FragmentActivity ?: return
+        val activity: FragmentActivity = this.activity as? FragmentActivity ?: return
 
         val ft = activity.supportFragmentManager.beginTransaction()
         ft.setCustomAnimations(

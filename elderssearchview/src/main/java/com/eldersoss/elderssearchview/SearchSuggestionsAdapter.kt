@@ -26,9 +26,9 @@ import android.widget.*
 /**
  * Created by IvanVatov on 5/16/2018.
  */
-class SearchSuggestionsAdapter(private val activity: Activity, private val callback: (String) -> Unit, logFile: String, private val iconsColor: Int, private val iconsWidth: Int) : BaseAdapter(), ListAdapter {
+class SearchSuggestionsAdapter(private val context: Context, private val callback: (String) -> Unit, logFile: String, private val iconsColor: Int, private val iconsWidth: Int) : BaseAdapter(), ListAdapter {
 
-    private val storage = RecentSearchesStorage(activity, logFile)
+    private val storage = RecentSearchesStorage(context, logFile)
     private val filteredListItems = ArrayList<String>()
     private var filterChars: CharSequence = ""
 
@@ -40,7 +40,7 @@ class SearchSuggestionsAdapter(private val activity: Activity, private val callb
         var returnView = convertView
 
         if (returnView == null) {
-            val inflater = activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
             returnView = inflater.inflate(R.layout.esv_search_suggestions_row, null)
         }
