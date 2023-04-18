@@ -20,6 +20,7 @@ import android.app.Activity
 import android.content.Context
 import android.os.Build
 import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.InputType
 import android.text.TextUtils
@@ -158,8 +159,7 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
 
         customAttributes.recycle()
         if (esvSuggestionsEnabled) {
-            val activity = (context as? Activity) ?: return
-            searchSuggestionsAdapter = SearchSuggestionsAdapter(activity, { searchForText(it) }, esvSuggestionsFileName, esvIconsColor, esvIconsWidth)
+            searchSuggestionsAdapter = SearchSuggestionsAdapter(context, { searchForText(it) }, esvSuggestionsFileName, esvIconsColor, esvIconsWidth)
             searchSuggestionsFragment = SearchSuggestionsFragment.create(searchSuggestionsAdapter!!, esvBackground, esvElevation, esvMargin)
         }
         applyStyles()
@@ -499,7 +499,7 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
         if (!esvNoFilter) {
             filterButton.visibility = View.GONE
         }
-        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
+        imm.showSoftInput(searchEditText, InputMethodManager.HIDE_IMPLICIT_ONLY)
         if (searchEditText.text.toString().isEmpty()) {
             searchHint.visibility = View.VISIBLE
             imageButtonSpeech.visibility = View.VISIBLE
@@ -519,7 +519,7 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
         searchEditText.setText(searchText, TextView.BufferType.EDITABLE)
         searchEditText.clearFocus()
         // delay execution to be sure that suggestions has been removed
-        Handler().postDelayed(
+        Handler(Looper.getMainLooper()).postDelayed(
             {
                 searchListener?.invoke(searchText)
             }, 300
