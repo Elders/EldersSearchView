@@ -18,7 +18,6 @@ package com.eldersoss.elderssearchview
 
 import android.app.Activity
 import android.content.Context
-import android.content.ContextWrapper
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
@@ -51,6 +50,8 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
     private var searchTextChangeListener: ((chars: CharSequence?) -> Unit)? = null
 
     private var backListener: (() -> String?)? = null
+
+    private val activity: Activity
 
     // Attributes and their default values
     private var esvHintText = ""
@@ -100,6 +101,7 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
 
         z = 250F
+        activity = context.resolveActivity()
 
         val customAttributes = context.theme.obtainStyledAttributes(
             attrs,
@@ -160,7 +162,6 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
 
         customAttributes.recycle()
         if (esvSuggestionsEnabled) {
-            val activity = context.resolveActivity()
             searchSuggestionsAdapter = SearchSuggestionsAdapter(activity, { searchForText(it) }, esvSuggestionsFileName, esvIconsColor, esvIconsWidth)
             searchSuggestionsFragment = SearchSuggestionsFragment.create(searchSuggestionsAdapter!!, esvBackground, esvElevation, esvMargin)
         }
@@ -376,9 +377,7 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
 
     private fun initListeners() {
         imageButtonSpeech.setOnClickListener {
-            (context as? Activity)?.let {
-                SpeechSearchDialog(it, this, esvSpeechRecognizerLogo)
-            }
+            SpeechSearchDialog(activity, this, esvSpeechRecognizerLogo)
         }
 
         imageButtonSearch.setOnClickListener { searchEditText.requestFocus() }
@@ -553,7 +552,7 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
 
     private fun showHideSuggestions(show: Boolean) {
 
-        val activity: FragmentActivity = context as? FragmentActivity ?: return
+        val activity: FragmentActivity = this.activity as? FragmentActivity ?: return
 
         val ft = activity.supportFragmentManager.beginTransaction()
         ft.setCustomAnimations(
