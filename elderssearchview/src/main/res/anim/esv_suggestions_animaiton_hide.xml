@@ -2,9 +2,13 @@
 <set xmlns:android="http://schemas.android.com/apk/res/android"
     android:fillAfter="true">
 
-    <translate
+    <scale
         android:duration="300"
-        android:fromYDelta="0%"
-        android:interpolator="@android:anim/linear_interpolator"
-        android:toYDelta="-100%" />
+        android:fromXScale="100%"
+        android:fromYScale="100%"
+        android:pivotX="50%"
+        android:pivotY="0%"
+        android:toXScale="100%"
+        android:toYScale="0%" />
+
 </set>
