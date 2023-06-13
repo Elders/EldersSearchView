@@ -606,6 +606,7 @@ class EldersSearchView : RelativeLayout, SpeechSearchDialog.SpeechSearchListener
     private fun showHideSuggestions(show: Boolean) {
 
         if (show) {
+            suggestionsViewLayout.visibility = View.INVISIBLE
             suggestionsViewLayout.startAnimation(showAnimation)
         } else {
             suggestionsViewLayout.startAnimation(hideAnimation)
