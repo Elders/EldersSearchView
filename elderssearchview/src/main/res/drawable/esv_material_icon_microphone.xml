@@ -1,8 +1,9 @@
-<!-- drawable/microphone.xml -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:height="24dp"
     android:width="24dp"
-    android:viewportWidth="24"
-    android:viewportHeight="24">
-    <path android:fillColor="#000" android:pathData="M12,2A3,3 0 0,1 15,5V11A3,3 0 0,1 12,14A3,3 0 0,1 9,11V5A3,3 0 0,1 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,0 12,16A5,5 0 0,0 17,11H19Z" />
+    android:height="24dp"
+    android:viewportWidth="960"
+    android:viewportHeight="960">
+  <path
+      android:fillColor="#FF000000"
+      android:pathData="M480,560q-50,0 -85,-35t-35,-85v-240q0,-50 35,-85t85,-35q50,0 85,35t35,85v240q0,50 -35,85t-85,35ZM480,320ZM440,800v-83q-92,-13 -157.5,-78T203,481q-2,-17 9,-29t28,-12q17,0 28.5,11.5T284,480q14,70 69.5,115T480,640q72,0 127,-45.5T676,480q4,-17 15.5,-28.5T720,440q17,0 28,12t9,29q-14,91 -79,157t-158,79v83q0,17 -11.5,28.5T480,840q-17,0 -28.5,-11.5T440,800ZM480,480q17,0 28.5,-11.5T520,440v-240q0,-17 -11.5,-28.5T480,160q-17,0 -28.5,11.5T440,200v240q0,17 11.5,28.5T480,480Z"/>
 </vector>
